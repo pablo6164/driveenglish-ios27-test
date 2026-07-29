@@ -754,7 +754,11 @@ function speak(text, options={}){
     };
 
     const replaceCurrent = options.cancel!==false && (synth.speaking || synth.pending);
-    if(replaceCurrent) synth.cancel();
+    const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    // Na iOS nie anulujemy aktywnego głosu tuż przed kolejnym speak(),
+    // bo WebKit potrafi wtedy wyciszyć również nową wypowiedź. Zamiast
+    // tego kolejna wymowa trafia do kolejki systemowego lektora.
+    if(replaceCurrent && !isiPhone) synth.cancel();
 
     const startSpeaking=()=>{
       synth.resume();
@@ -765,7 +769,6 @@ function speak(text, options={}){
     // iPhone wymaga startu bezpośrednio po dotknięciu. Na Macu silnik
     // potrzebuje natomiast krótkiej przerwy tylko wtedy, gdy przed chwilą
     // anulowano inną wypowiedź.
-    const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
     if(replaceCurrent && !isiPhone) setTimeout(startSpeaking,60);
     else startSpeaking();
   });
@@ -1018,11 +1021,11 @@ let suppressFlip = false;
 function flipCard(){
   if(suppressFlip) return;
   const showingTranslation = !state.flipped;
-  state.flipped = !state.flipped; render();
   if(showingTranslation){
     const w=state.deck[state.idx];
     if(w) speak(w.en);
   }
+  state.flipped = !state.flipped; render();
 }
 function markCard(known){
   const w = state.deck[state.idx];
