@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta id="statusBarMeta" name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta id="themeColorMeta" name="theme-color" content="#12151A">
+<title>DriveEnglish — iOS 27 Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151A;
+    --surface:#1B2028;
+    --surface2:#232A34;
+    --line:#2C333F;
+    --accent:#F5B700;
+    --accent-dim:#8A6A00;
+    --route:#4DD0E1;
+    --text:#ECEFF4;
+    --muted:#8A93A3;
+    --good:#6BCB77;
+    --bad:#FF6B6B;
+  }
+  html[data-theme="light"]{
+    --bg:#F4F6F8;
+    --surface:#FFFFFF;
+    --surface2:#E9EDF2;
+    --line:#D6DCE4;
+    --accent:#D99A00;
+    --accent-dim:#A97900;
+    --route:#007C91;
+    --text:#171A1F;
+    --muted:#667085;
+    --good:#31934A;
+    --bad:#D64545;
+  }
+  html[data-theme="light"] body{background:#E5E9EE;}
+  html[data-theme="light"] .topbar{background:linear-gradient(180deg,#FFFFFF,var(--bg));}
+  html[data-theme="light"] .gauge-card{background:radial-gradient(120% 140% at 15% 0%,#FFFFFF,var(--surface));}
+  html[data-theme="light"] .face-front{background:linear-gradient(150deg,#FFFFFF,var(--surface));}
+  html[data-theme="light"] .face-back{background:linear-gradient(150deg,#F2F7FA,var(--surface2));}
+  html[data-theme="light"] .mix-card, html[data-theme="light"] .dlg-passenger .dlg-bubble{background:linear-gradient(120deg,#E8F5F7,var(--surface));}
+  html[data-theme="light"] .bottom-nav{background:rgba(255,255,255,.94);}
+  html[data-theme="light"] .toast{background:#FFFFFF;box-shadow:0 8px 30px rgba(30,41,59,.18);}
+  .theme-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg);
+    font-family:'Inter',sans-serif; color:var(--text);
+    display:flex; justify-content:center; align-items:stretch;
+  }
+  .shell{
+    width:100%; max-width:430px; min-height:100vh; min-height:100dvh;
+    background:var(--bg); display:flex; flex-direction:column;
+    position:relative; overflow:hidden;
+  }
+  .status-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:calc(env(safe-area-inset-top, 6px) + 4px) 26px 4px;
+    font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    font-size:15px; font-weight:600; color:var(--text);
+    background:var(--bg); position:relative; z-index:20; flex-shrink:0;
+  }
+  .status-icons{display:flex; align-items:center; gap:6px; color:var(--text);}
+  #app{
+    width:100%; flex:1; min-height:0;
+    background:var(--bg);
+    display:flex; flex-direction:column;
+    position:relative; overflow:hidden;
+  }
+  .home-indicator{
+    position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+    width:134px; height:5px; border-radius:3px;
+    background:rgba(236,239,244,.35); z-index:30; pointer-events:none;
+  }
+  .topbar{
+    padding:14px 20px 14px; display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, #161A21, var(--bg));
+    position:sticky; top:0; z-index:5;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:var(--accent); color:#14171C;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;
+  }
+  .brand-text{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; letter-spacing:.2px;}
+  .brand-sub{font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; letter-spacing:.5px;}
+  .back-btn{
+    background:none; border:none; color:var(--accent);
+    padding:6px 10px 6px 2px; margin-left:-6px; border-radius:10px; cursor:pointer;
+    display:flex; align-items:center; gap:2px;
+    font-family:-apple-system, BlinkMacSystemFont, sans-serif; font-size:16px; font-weight:600;
+  }
+  .back-btn .chevron{font-size:22px; font-weight:600; line-height:1;}
+  .screen{flex:1; overflow-y:auto; padding:18px 20px 128px;}
+  .screen::-webkit-scrollbar{display:none;}
+
+  /* ---- HOME ---- */
+  .gauge-card{
+    background:radial-gradient(120% 140% at 15% 0%, #1E2530, var(--surface));
+    border:1px solid var(--line); border-radius:20px; padding:22px;
+    display:flex; align-items:center; gap:18px; margin-bottom:22px;
+  }
+  .gauge-label{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:1px; text-transform:uppercase;}
+  .gauge-num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:26px; margin-top:4px;}
+  .gauge-sub{font-size:12px; color:var(--muted); margin-top:6px;}
+  .section-title{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px;
+    text-transform:uppercase; letter-spacing:.8px; color:var(--muted);
+    margin:22px 0 12px;
+  }
+  .cat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .cat-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:16px; cursor:pointer; transition:transform .15s;
+  }
+  .cat-card:active{transform:scale(.96);}
+  .cat-icon{font-size:24px;}
+  .cat-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; margin-top:10px; line-height:1.25;}
+  .cat-count{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin-top:6px;}
+  .cat-bar{height:4px; background:var(--line); border-radius:3px; margin-top:10px; overflow:hidden;}
+  .cat-bar-fill{height:100%; background:var(--accent);}
+  .mix-card{
+    margin-top:14px; background:linear-gradient(120deg, #22303A, var(--surface));
+    border:1px solid var(--route); border-radius:16px; padding:16px 18px;
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  }
+  .mix-card .cat-name{color:var(--route);}
+
+  /* ---- FLASHCARD ---- */
+  .lesson-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  .lesson-title{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px;}
+  .progress-track{flex:1; height:6px; background:var(--surface2); border-radius:4px; overflow:hidden; margin:0 4px;}
+  .progress-fill{height:100%; background:var(--accent);}
+  .card-count{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); text-align:right; margin-bottom:10px;}
+  .flash-wrap{perspective:1200px; height:290px; margin-bottom:18px; position:relative;}
+  .swipe-layer{width:100%; height:100%; touch-action:pan-y; will-change:transform;}
+  .swipe-badge{
+    position:absolute; top:14px; z-index:6; padding:8px 14px; border-radius:10px;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; letter-spacing:.4px;
+    opacity:0; pointer-events:none; border:1px solid;
+  }
+  .badge-left{left:14px; background:rgba(35,42,52,.9); color:var(--muted); border-color:var(--line); transform:rotate(-6deg);}
+  .badge-right{right:14px; background:rgba(107,203,119,.15); color:var(--good); border-color:var(--good); transform:rotate(6deg);}
+  .flash-card{
+    position:relative; width:100%; height:100%; cursor:pointer;
+    transform-style:preserve-3d; transition:transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .flash-card.flipped{transform:rotateY(180deg);}
+  .face{
+    position:absolute; inset:0; border-radius:22px; backface-visibility:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:26px; text-align:center; border:1px solid var(--line);
+  }
+  .face-front{background:linear-gradient(150deg,#1E2530,var(--surface));}
+  .face-back{background:linear-gradient(150deg,#26313B,var(--surface2)); transform:rotateY(180deg);}
+  .en-word{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:26px; line-height:1.25;}
+  .phon{
+    font-family:'JetBrains Mono',monospace; color:var(--accent); font-size:15px;
+    margin-top:14px; padding:6px 12px; border:1px dashed var(--accent-dim); border-radius:8px;
+  }
+  .pl-word{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:24px; color:var(--route);}
+  .tap-hint{font-size:11px; color:var(--muted); margin-top:16px; font-family:'JetBrains Mono',monospace;}
+  .audio-btn{
+    position:absolute; top:14px; right:14px; width:40px;height:40px; border-radius:12px;
+    background:var(--surface2); border:1px solid var(--line); color:var(--accent);
+    font-size:17px; display:flex;align-items:center;justify-content:center; cursor:pointer;
+  }
+  .action-row{display:flex; gap:12px;}
+  .act-btn{
+    flex:1; padding:15px; border-radius:14px; border:none; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .act-repeat{background:var(--surface2); color:var(--text); border:1px solid var(--line);}
+  .act-know{background:var(--good); color:#0B1A0E;}
+  .nav-row{display:flex; justify-content:space-between; margin-top:14px;}
+  .nav-btn{background:none; border:none; color:var(--muted); font-size:13px; font-family:'JetBrains Mono',monospace; cursor:pointer;}
+
+  /* ---- QUIZ ---- */
+  .quiz-prompt{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:26px 20px;
+    text-align:center; margin-bottom:18px;
+  }
+  .quiz-tag{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--route); letter-spacing:1px;}
+  .quiz-word{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:24px; margin-top:10px;}
+  .opt-list{display:flex; flex-direction:column; gap:10px;}
+  .opt-btn{
+    background:var(--surface); border:1px solid var(--line); color:var(--text);
+    padding:15px 16px; border-radius:14px; font-size:15px; font-family:'Inter',sans-serif;
+    text-align:left; cursor:pointer;
+  }
+  .opt-btn.correct{background:rgba(107,203,119,.18); border-color:var(--good); color:var(--good);}
+  .opt-btn.wrong{background:rgba(255,107,107,.18); border-color:var(--bad); color:var(--bad);}
+  .quiz-progress{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); margin-bottom:14px;}
+  .result-num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:44px; color:var(--accent); text-align:center; margin:20px 0 6px;}
+  .result-sub{text-align:center; color:var(--muted); font-size:13px; margin-bottom:24px;}
+  .primary-btn{
+    width:100%; padding:16px; border-radius:14px; border:none; background:var(--accent);
+    color:#14171C; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; cursor:pointer;
+  }
+
+  /* ---- PROGRESS ---- */
+  .stat-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:10px;}
+  .stat-top{display:flex; justify-content:space-between; align-items:center;}
+  .stat-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px;}
+  .stat-pct{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent);}
+
+  /* ---- DIALOGUES ---- */
+  .dlg-wrap{display:flex; flex-direction:column; gap:14px;}
+  .dlg-row{display:flex; flex-direction:column; max-width:86%;}
+  .dlg-row.dlg-driver{align-items:flex-start; align-self:flex-start;}
+  .dlg-row.dlg-passenger{align-items:flex-end; align-self:flex-end;}
+  .dlg-tag{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.6px;
+    color:var(--muted); margin-bottom:4px; padding:0 2px;
+  }
+  .dlg-bubble{
+    position:relative; border-radius:16px; padding:14px 44px 14px 16px;
+    border:1px solid var(--line);
+  }
+  .dlg-driver .dlg-bubble{background:var(--surface); border-bottom-left-radius:4px;}
+  .dlg-passenger .dlg-bubble{background:linear-gradient(120deg, #22303A, var(--surface)); border-color:var(--route); border-bottom-right-radius:4px;}
+  .dlg-en{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; line-height:1.3;}
+  .dlg-pl{font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.3;}
+  .dlg-audio{
+    position:absolute; top:10px; right:10px; width:28px; height:28px; font-size:12px; border-radius:9px;
+  }
+
+  /* ---- BOTTOM NAV ---- */
+  .bottom-nav{
+    position:absolute; bottom:0; left:0; right:0;
+    height:calc(58px + env(safe-area-inset-bottom, 18px));
+    padding-bottom:env(safe-area-inset-bottom, 18px);
+    background:rgba(27,32,40,.92); backdrop-filter:blur(10px);
+    border-top:1px solid var(--line); display:flex;
+  }
+  .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    color:var(--muted); background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .nav-item.active{color:var(--accent);}
+  .nav-item .ic{font-size:20px;}
+  .nav-item .lb{font-size:10px; font-weight:600;}
+  .empty{text-align:center; color:var(--muted); padding:40px 10px; font-size:14px;}
+
+  .daily-card{background:linear-gradient(135deg,#242C36,var(--surface));border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;}
+  .daily-row{display:flex;justify-content:space-between;gap:12px;align-items:center;}
+  .daily-num{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:var(--accent);}
+  .mini-label{font-size:11px;color:var(--muted);margin-top:3px;}
+  .secondary-btn{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;}
+  .danger-btn{color:var(--bad);border-color:rgba(255,107,107,.45);}
+  .toast{position:absolute;left:20px;right:20px;bottom:calc(76px + env(safe-area-inset-bottom,18px));z-index:50;background:#262E39;border:1px solid var(--line);border-radius:13px;padding:12px 14px;text-align:center;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.35);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="status-bar">
+    <span id="statusClock">9:41</span>
+    <div class="status-icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.6" fill="currentColor"/><rect x="5" y="6" width="3" height="6" rx="0.6" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="0.6" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="0.6" fill="currentColor"/></svg>
+      <svg width="16" height="14" viewBox="0 0 18 14" fill="none"><path d="M9 12.6a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="currentColor"/><path d="M4.5 8.2a6.3 6.3 0 019 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M1.3 4.8a10.7 10.7 0 0115.4 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.75" y="0.75" width="20.5" height="10.5" rx="2.75" stroke="currentColor" stroke-width="1"/><rect x="2.25" y="2.25" width="15" height="7.5" rx="1.2" fill="currentColor"/><rect x="22.5" y="4" width="1.8" height="4" rx="0.8" fill="currentColor"/></svg>
+    </div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+/* ================= VOCAB DATA ================= */
+const DATA = {
+greet:{label:"Powitania i uprzejmości", icon:"👋", words:[
+["Hello","Cześć","helłou"],["Hi","Hej","haj"],["Good morning","Dzień dobry (rano)","gud mornin"],
+["Good afternoon","Dzień dobry (popołudnie)","gud afternun"],["Good evening","Dobry wieczór","gud iwnin"],
+["Good night","Dobranoc","gud najt"],["Welcome","Witamy","łelkam"],["Thank you","Dziękuję","fenk ju"],
+["Thank you very much","Dziękuję bardzo","fenk ju weri macz"],["You're welcome","Proszę bardzo","jor łelkam"],
+["Please","Proszę","pliz"],["Excuse me","Przepraszam (zwrócenie uwagi)","ikskjuz mi"],
+["Sorry","Przepraszam (przeprosiny)","sorri"],["Yes","Tak","jes"],["No","Nie","nol"],
+["Okay","Dobrze / OK","okej"],["Sure","Jasne","szur"],["Of course","Oczywiście","of kors"],
+["No problem","Żaden problem","nol problem"],["Have a nice day","Miłego dnia","hew e najs dej"],
+["Have a safe trip","Bezpiecznej podróży","hew e sejf trip"],["Goodbye","Do widzenia","gudbaj"],
+["Bye","Cześć (na do widzenia)","baj"],["See you","Do zobaczenia","si ju"],["Take care","Trzymaj się","tejk keer"],
+["How are you?","Jak się masz?","hał ar ju"],["I'm fine, thanks","W porządku, dzięki","ajm fajn fenks"],
+["Nice to meet you","Miło cię poznać","najs tu mit ju"],["What's your name?","Jak masz na imię?","łots jor nejm"],
+["My name is...","Nazywam się...","maj nejm iz"],["Are you ready?","Jesteś gotowy?","ar ju redi"]
+]},
+dir:{label:"Kierunki i nawigacja", icon:"🧭", words:[
+["Where do you want to go?","Dokąd chcesz jechać?","łer du ju łont tu gol"],
+["Where are you going?","Dokąd jedziesz?","łer ar ju gołin"],["What's the address?","Jaki jest adres?","łots di adres"],
+["Turn left","Skręć w lewo","tern left"],["Turn right","Skręć w prawo","tern rajt"],
+["Go straight","Jedź prosto","gol strejt"],["Straight ahead","Prosto przed siebie","strejt ehed"],
+["Make a U-turn","Zawróć","mejk e ju-tern"],["Next exit","Następny zjazd","nekst egzit"],
+["Take the highway","Jedź autostradą","tejk de hajłej"],["Take the exit","Zjedź na zjeździe","tejk di egzit"],
+["Stop here, please","Proszę się tu zatrzymać","stop hijer pliz"],["Stop at the corner","Zatrzymaj się na rogu","stop et de korner"],
+["Pull over","Zjedź na bok","pul ołwer"],["Wait here, please","Proszę tu poczekać","łejt hijer pliz"],
+["It's on the left","To po lewej stronie","its on de left"],["It's on the right","To po prawej stronie","its on de rajt"],
+["Cross the street","Przejdź przez ulicę","kros de strit"],["Next to","Obok","nekst tu"],
+["Across from","Naprzeciwko","ekros from"],["Behind","Za","bihajnd"],["In front of","Przed","in front of"],
+["Near","Blisko","nijer"],["Far","Daleko","far"],["How far is it?","Jak daleko to jest?","hał far iz it"],
+["How long will it take?","Jak długo to potrwa?","hał long łil it tejk"],["Traffic jam","Korek","trafik dżem"],
+["There's traffic","Jest korek","ders trafik"],["Shortcut","Skrót","szortkat"],["Follow the GPS","Jedź za nawigacją","folłoł de dżi-pi-es"],
+["The GPS says...","Nawigacja mówi...","de dżi-pi-es sez"],["Recalculating","Przeliczanie trasy","rikalkjulejtin"],
+["Wrong way","Zły kierunek","rong łej"],["One-way street","Ulica jednokierunkowa","łan-łej strit"],
+["Dead end","Ślepa uliczka","ded end"],["Roundabout","Rondo","rałndebałt"],["Traffic light","Sygnalizacja świetlna","trafik lajt"],
+["Intersection","Skrzyżowanie","interseksziyn"],["Bridge","Most","brydż"],["Tunnel","Tunel","tanel"],
+["Parking lot","Parking","parkin lot"],["No parking","Zakaz parkowania","nol parkin"],
+["Speed bump","Próg zwalniający","spid bamp"],["Construction zone","Roboty drogowe","konstrakszyn zoun"]
+]},
+pay:{label:"Płatności", icon:"💳", words:[
+["How much is it?","Ile to kosztuje?","hał macz iz it"],["The fare is...","Opłata wynosi...","de fer iz"],
+["Cash or card?","Gotówka czy karta?","kesz or kard"],["I'll pay by card","Zapłacę kartą","ajl pej baj kard"],
+["I'll pay in cash","Zapłacę gotówką","ajl pej in kesz"],["Do you accept cards?","Czy przyjmujecie karty?","du ju eksept kards"],
+["Here's your change","Oto reszta","hijers jor czejndż"],["Keep the change","Zatrzymaj resztę","kip de czejndż"],
+["Tip","Napiwek","typ"],["Thank you for the tip","Dziękuję za napiwek","fenk ju for de typ"],
+["Receipt","Paragon","risit"],["Do you need a receipt?","Potrzebujesz paragonu?","du ju nid e risit"],
+["The app shows...","Aplikacja pokazuje...","di ep szołz"],["Rate","Cena / stawka","rejt"],["Total","Suma","toutl"],
+["Extra charge","Dodatkowa opłata","ekstra czardż"],["Toll","Opłata za autostradę","toul"],
+["Toll road","Płatna droga","toul roud"],["Surcharge","Dopłata","sercziardż"],["Discount","Zniżka","diskałnt"],
+["Free ride","Darmowy kurs","fri rajd"],["Cancel the ride","Anuluj kurs","kensel de rajd"],
+["Cancellation fee","Opłata za anulowanie","kenselejszyn fi"],["Payment failed","Płatność nie powiodła się","pejmynt fejld"],
+["Try again","Spróbuj ponownie","traj egen"],["Card declined","Karta odrzucona","kard diklajnd"],
+["Promo code","Kod promocyjny","promol koud"],["Balance","Saldo","belens"],["Refund","Zwrot pieniędzy","rifand"],
+["Price","Cena","prajs"],["Expensive","Drogie","ikspensiw"],["Cheap","Tanie","czip"],
+["Minimum fare","Minimalna opłata","minimum fer"],["Wait time fee","Opłata za oczekiwanie","łejt tajm fi"],
+["Cash only","Tylko gotówka","kesz onli"],["Split the fare","Podzielić opłatę","split de fer"],
+["Bill","Rachunek","byl"],["Coins","Monety","koins"],["Bank note","Banknot","benk nołt"],["Currency","Waluta","kurensi"]
+]},
+talk:{label:"Small talk", icon:"💬", words:[
+["How's your day going?","Jak mija dzień?","hałz jor dej gołin"],["Are you visiting the city?","Zwiedzasz miasto?","ar ju wizytin de siti"],
+["Where are you from?","Skąd jesteś?","łer ar ju from"],["I'm from Poland","Jestem z Polski","ajm from pouland"],
+["Is this your first time here?","Czy jesteś tu pierwszy raz?","iz dis jor ferst tajm hijer"],
+["Do you like the city?","Podoba ci się miasto?","du ju lajk de siti"],["What brings you here?","Co cię tu sprowadza?","łot bryngz ju hijer"],
+["Business or pleasure?","Interesy czy przyjemność?","biznys or pleżer"],["Are you here for work?","Jesteś tu w interesach?","ar ju hijer for łork"],
+["On vacation","Na wakacjach","on wekejszyn"],["I'm on vacation","Jestem na wakacjach","ajm on wekejszyn"],
+["Nice weather today","Ładna dzisiaj pogoda","najs łeder tudej"],["It's hot today","Dziś jest gorąco","its hot tudej"],
+["It's cold today","Dziś jest zimno","its kould tudej"],["How long have you lived here?","Jak długo tu mieszkasz?","hał long hew ju liwd hijer"],
+["Do you have any recommendations?","Masz jakieś polecenia?","du ju hew eni rekomendejszyns"],
+["What's a good restaurant nearby?","Jaka jest dobra restauracja w pobliżu?","łots e gud restorant nirbaj"],
+["I recommend...","Polecam...","aj rekomend"],["Are you in a hurry?","Śpieszysz się?","ar ju in e hary"],
+["Take your time","Nie spiesz się","tejk jor tajm"],["Would you like some music?","Chcesz muzykę?","łud ju lajk sam mjuzik"],
+["Is the temperature okay?","Temperatura odpowiada?","iz de tempreczer okej"],
+["Would you like the window open?","Otworzyć okno?","łud ju lajk de łindoł oupen"],
+["Feel free to charge your phone","Możesz naładować telefon","fil fri tu czardż jor foun"],
+["There's water in the back","Z tyłu jest woda","ders łoter in de bek"],["Enjoy your stay","Miłego pobytu","endżoj jor stej"],
+["Enjoy the trip","Miłej podróży","endżoj de trip"],["I hope you had a good day","Mam nadzieję, że miałeś dobry dzień","aj houp ju hed e gud dej"],
+["Congratulations","Gratulacje","kongraczulejszyns"],["Happy birthday","Wszystkiego najlepszego","hepi berfdej"],
+["Good luck","Powodzenia","gud lak"],["I understand","Rozumiem","aj anderstend"],["I don't understand","Nie rozumiem","aj dont anderstend"],
+["Can you repeat that?","Możesz to powtórzyć?","ken ju ripit det"],["Can you speak slower?","Możesz mówić wolniej?","ken ju spik słołer"],
+["I speak a little English","Mówię trochę po angielsku","aj spik e lytl inglisz"],
+["Sorry, my English isn't great","Przepraszam, mój angielski nie jest świetny","sorri maj inglisz iznt grejt"],
+["That's interesting","To ciekawe","dets interestin"],["Really?","Naprawdę?","rili"],["I see","Rozumiem / aha","aj si"],
+["Sounds good","Brzmi dobrze","saundz gud"],["No worries","Nie ma sprawy","noł łerriz"],["It happens","Zdarza się","it hepenz"],
+["Small talk","Pogawędka","smoł tok"],["Chat","Rozmowa","czat"],["Silence is fine","Cisza też jest ok","sajlens iz fajn"]
+]},
+prob:{label:"Problemy i sytuacje", icon:"🚧", words:[
+["I'm sorry, I'm late","Przepraszam za spóźnienie","ajm sorri ajm lejt"],["There's traffic","Jest korek","ders trafik"],
+["I took a wrong turn","Skręciłem w złą stronę","aj tuk e rong tern"],["Sorry for the delay","Przepraszam za opóźnienie","sorri for de dilej"],
+["The road is closed","Droga jest zamknięta","de roud iz klołzd"],["Accident ahead","Wypadek z przodu","eksydent ehed"],
+["I need to stop for gas","Muszę zatankować","aj nid tu stop for ges"],["Flat tire","Przebita opona","flet tajer"],
+["Car trouble","Problem z samochodem","kar trabl"],["Engine problem","Problem z silnikiem","endżyn problem"],
+["The car won't start","Samochód nie odpala","de kar łołnt start"],["I need a mechanic","Potrzebuję mechanika","aj nid e mekenik"],
+["Call the police","Zadzwoń na policję","kol de polis"],["Call an ambulance","Wezwij karetkę","kol en embjulens"],
+["Emergency","Nagły wypadek","imerdżensi"],["Are you okay?","Wszystko w porządku?","ar ju okej"],["I'm okay","Jestem cały","ajm okej"],
+["I need help","Potrzebuję pomocy","aj nid help"],["Watch out!","Uważaj!","łocz ałt"],["Careful!","Ostrożnie!","kerful"],
+["Seatbelt, please","Proszę zapiąć pas","sitbelt pliz"],["Please fasten your seatbelt","Proszę zapiąć pasy","pliz fesn jor sitbelt"],
+["I feel sick","Źle się czuję","aj fil syk"],["Do you need a bag?","Potrzebujesz torebki?","du ju nid e beg"],
+["Please don't smoke","Proszę nie palić","pliz dołnt smołk"],["No eating in the car","Zakaz jedzenia w samochodzie","noł itin in de kar"],
+["I left my phone","Zostawiłem telefon","aj left maj foun"],["You forgot your bag","Zapomniałeś torby","ju forgot jor beg"],
+["Lost and found","Biuro rzeczy znalezionych","lost end faund"],["I can't find the address","Nie mogę znaleźć adresu","aj kent fajnd di adres"],
+["The address is wrong","Adres jest zły","di adres iz rong"],["Signal is bad","Sygnał jest słaby","signel iz bed"],
+["My phone died","Rozładował mi się telefon","maj foun dajd"],["I'm lost","Zgubiłem się","ajm lost"],
+["One moment, please","Chwileczkę","łan moument pliz"],["I need to reroute","Muszę zmienić trasę","aj nid tu riraut"],
+["Roadblock","Blokada drogi","roudblok"],["Detour","Objazd","ditur"],["Please be quiet","Proszę o ciszę","pliz bi kłajet"],
+["Please calm down","Proszę się uspokoić","pliz kalm dałn"],["I can't do that","Nie mogę tego zrobić","aj kent du det"],
+["That's against the rules","To wbrew zasadom","dets egenst de rulz"],["I have to cancel","Muszę anulować","aj hev tu kensel"],
+["Low battery","Niski poziom baterii","loł beteri"],["Check engine light","Kontrolka silnika","czek endżyn lajt"]
+]},
+veh:{label:"Pojazd", icon:"🚗", words:[
+["Car","Samochód","kar"],["Door","Drzwi","dor"],["Window","Okno","łindoł"],["Seat","Siedzenie","sit"],
+["Front seat","Przednie siedzenie","front sit"],["Back seat","Tylne siedzenie","bek sit"],["Trunk","Bagażnik","trank"],
+["Seatbelt","Pas bezpieczeństwa","sitbelt"],["Steering wheel","Kierownica","stirin łil"],
+["Air conditioning","Klimatyzacja","er kondyszynin"],["Heater","Ogrzewanie","hiter"],["Radio","Radio","rejdioł"],
+["GPS","Nawigacja","dżi-pi-es"],["Phone charger","Ładowarka do telefonu","foun czardżer"],["USB cable","Kabel USB","ju-es-bi kejbl"],
+["Mirror","Lusterko","myror"],["Wheel","Koło","łil"],["Tire","Opona","tajer"],["Engine","Silnik","endżyn"],
+["Brake","Hamulec","brejk"],["Gas pedal","Pedał gazu","ges pedl"],["Fuel","Paliwo","fjuel"],
+["Gas station","Stacja benzynowa","ges stejszyn"],["Battery","Akumulator","beteri"],["Headlights","Reflektory","hedlajts"],
+["Turn signal","Kierunkowskaz","tern signel"],["License plate","Tablica rejestracyjna","lajsens plejt"],
+["Windshield","Przednia szyba","łindszild"],["Wiper","Wycieraczka","łajper"],["Horn","Klakson","horn"],
+["Speedometer","Prędkościomierz","spidometer"],["Dashboard","Deska rozdzielcza","deszbord"],["Roof","Dach","ruf"],
+["Bumper","Zderzak","bamper"],["Hood","Maska","hud"],["Key","Kluczyk","ki"],["Lock","Zamek","lok"],
+["Unlock","Odblokować","anlok"],["Child seat","Fotelik dziecięcy","czajld sit"],["Luggage space","Miejsce na bagaż","lagydż spejs"]
+]},
+place:{label:"Miejsca", icon:"📍", words:[
+["Airport","Lotnisko","erport"],["Train station","Dworzec kolejowy","trejn stejszyn"],["Bus station","Dworzec autobusowy","bas stejszyn"],
+["Hotel","Hotel","hotel"],["Restaurant","Restauracja","restorant"],["Hospital","Szpital","hospitl"],["Pharmacy","Apteka","farmesi"],
+["Bank","Bank","benk"],["Airport terminal","Terminal lotniska","erport terminel"],["Shopping mall","Centrum handlowe","szopin mol"],
+["Supermarket","Supermarket","supermarket"],["Gas station","Stacja benzynowa","ges stejszyn"],["Downtown","Centrum miasta","dałntałn"],
+["City center","Centrum miasta","siti senter"],["Suburb","Przedmieście","saberb"],["Neighborhood","Dzielnica","nejborhud"],
+["Street","Ulica","strit"],["Avenue","Aleja","ewenju"],["Highway","Autostrada","hajłej"],["Parking garage","Parking wielopoziomowy","parkin garadż"],
+["Office","Biuro","ofis"],["School","Szkoła","skul"],["University","Uniwersytet","juniwersyti"],["Church","Kościół","czercz"],
+["Park","Park","park"],["Stadium","Stadion","stejdiym"],["Theater","Teatr","fiyter"],["Cinema","Kino","synema"],
+["Museum","Muzeum","mjuziym"],["Library","Biblioteka","lajbreri"],["Police station","Komisariat policji","polis stejszyn"],
+["Fire station","Straż pożarna","fajer stejszyn"],["Post office","Poczta","poust ofis"],["Gym","Siłownia","dżym"],
+["Beach","Plaża","bicz"],["Lake","Jezioro","lejk"],["River","Rzeka","riwer"],["Bridge","Most","brydż"],
+["Building","Budynek","byldyn"],["Apartment","Mieszkanie","epartment"],["House","Dom","hałs"],["Entrance","Wejście","entrans"],
+["Exit","Wyjście","egzyt"],["Corner","Róg","korner"],["Block","Kwartał (ulic)","blok"],["Address","Adres","adres"],
+["Zip code","Kod pocztowy","zip koud"],["Floor","Piętro","flor"],["Lobby","Hol","lobi"],["Terminal","Terminal","terminel"]
+]},
+num:{label:"Liczby", icon:"🔢", words:[
+["Zero","Zero","ziroł"],["One","Jeden","łan"],["Two","Dwa","tu"],["Three","Trzy","fri"],["Four","Cztery","for"],
+["Five","Pięć","fajw"],["Six","Sześć","syks"],["Seven","Siedem","sewn"],["Eight","Osiem","ejt"],["Nine","Dziewięć","najn"],
+["Ten","Dziesięć","ten"],["Eleven","Jedenaście","ilewen"],["Twelve","Dwanaście","tłelw"],["Thirteen","Trzynaście","fertin"],
+["Fourteen","Czternaście","fortin"],["Fifteen","Piętnaście","fiftin"],["Sixteen","Szesnaście","sikstin"],
+["Seventeen","Siedemnaście","sewentin"],["Eighteen","Osiemnaście","ejtin"],["Nineteen","Dziewiętnaście","najntin"],
+["Twenty","Dwadzieścia","tłenti"],["Twenty-one","Dwadzieścia jeden","tłenti łan"],["Thirty","Trzydzieści","ferti"],
+["Forty","Czterdzieści","forti"],["Fifty","Pięćdziesiąt","fifti"],["Sixty","Sześćdziesiąt","siksti"],
+["Seventy","Siedemdziesiąt","sewenti"],["Eighty","Osiemdziesiąt","ejti"],["Ninety","Dziewięćdziesiąt","najnti"],
+["Hundred","Sto","handred"],["Thousand","Tysiąc","fałzend"],["First","Pierwszy","ferst"],["Second","Drugi","sekend"],
+["Third","Trzeci","ferd"],["Half","Połowa","haf"],["Quarter","Ćwierć","kłorter"],["Minute","Minuta","minit"],
+["Minutes","Minuty","minits"],["Hour","Godzina","ałer"],["Hours","Godziny","ałers"]
+]},
+time:{label:"Czas i dni", icon:"🕒", words:[
+["Monday","Poniedziałek","mandej"],["Tuesday","Wtorek","tjuzdej"],["Wednesday","Środa","łenzdej"],
+["Thursday","Czwartek","ferzdej"],["Friday","Piątek","frajdej"],["Saturday","Sobota","saterdej"],["Sunday","Niedziela","sandej"],
+["Today","Dzisiaj","tudej"],["Tomorrow","Jutro","tumorol"],["Yesterday","Wczoraj","jesterdej"],["Now","Teraz","nał"],
+["Later","Później","lejter"],["Early","Wcześnie","erli"],["Late","Późno","lejt"],["Morning","Rano","mornin"],
+["Afternoon","Popołudnie","afternun"],["Evening","Wieczór","iwnin"],["Night","Noc","najt"],
+["What time is it?","Która godzina?","łot tajm iz it"],["It's 5 o'clock","Jest piąta","its fajw oklok"],
+["In five minutes","Za pięć minut","in fajw minits"],["January","Styczeń","dżenjuery"],["February","Luty","februeri"],
+["March","Marzec","marcz"],["April","Kwiecień","ejprel"],["May","Maj","mej"],["June","Czerwiec","dżun"],
+["July","Lipiec","dżulaj"],["August","Sierpień","ogest"],["September","Wrzesień","september"],["October","Październik","oktołber"],
+["November","Listopad","nowember"],["December","Grudzień","disember"],["Week","Tydzień","łik"],["Month","Miesiąc","manf"],
+["Year","Rok","jyr"],["Weekend","Weekend","łikend"],["Rush hour","Godzina szczytu","rasz ałer"],["On time","Na czas","on tajm"]
+]},
+weather:{label:"Pogoda", icon:"☁️", words:[
+["Sunny","Słonecznie","sani"],["Cloudy","Pochmurno","klałdi"],["Rainy","Deszczowo","rejni"],["Snowy","Śnieżnie","snoły"],
+["Windy","Wietrznie","łyndi"],["Foggy","Mgliście","fogi"],["Hot","Gorąco","hot"],["Cold","Zimno","kould"],
+["Warm","Ciepło","łorm"],["Cool","Chłodno","kul"],["Storm","Burza","storm"],["Rain","Deszcz","rejn"],["Snow","Śnieg","snoł"],
+["Ice","Lód","ajs"],["Humid","Wilgotno","hjumyd"],["Temperature","Temperatura","tempreczer"],["Forecast","Prognoza","forkast"],
+["It's raining","Pada deszcz","its rejnin"],["It's snowing","Pada śnieg","its snołin"],
+["Drive safely, it's slippery","Jedź ostrożnie, jest ślisko","drajw sejfli its slipery"],["Icy road","Oblodzona droga","ajsi roud"],
+["Heatwave","Fala upałów","hitłejw"],["Clear sky","Czyste niebo","klijr skaj"],["Thunder","Grzmot","fander"],
+["Visibility","Widoczność","wyzybiliti"]
+]},
+verb:{label:"Czasowniki", icon:"⚡", words:[
+["Go","Iść / jechać","gol"],["Come","Przyjść / przyjechać","kam"],["Stop","Zatrzymać się","stop"],["Wait","Czekać","łejt"],
+["Drive","Prowadzić (samochód)","drajw"],["Turn","Skręcić","tern"],["Park","Parkować","park"],["Pay","Płacić","pej"],
+["Open","Otworzyć","oupen"],["Close","Zamknąć","klołz"],["Help","Pomóc","help"],["Need","Potrzebować","nid"],
+["Want","Chcieć","łont"],["Know","Wiedzieć / znać","nol"],["Understand","Rozumieć","anderstend"],["Speak","Mówić","spik"],
+["Say","Powiedzieć","sej"],["Tell","Powiedzieć (komuś)","tel"],["Ask","Zapytać","ask"],["Answer","Odpowiedzieć","anser"],
+["Hear","Słyszeć","hijer"],["Listen","Słuchać","lisen"],["See","Widzieć","si"],["Look","Patrzeć","luk"],["Watch","Obserwować","łocz"],
+["Find","Znaleźć","fajnd"],["Lose","Zgubić","luz"],["Give","Dać","giw"],["Take","Wziąć","tejk"],["Bring","Przynieść","bryng"],
+["Carry","Nieść","keri"],["Hold","Trzymać","hould"],["Put","Położyć","put"],["Get","Dostać","get"],["Buy","Kupić","baj"],
+["Sell","Sprzedać","sel"],["Use","Używać","juz"],["Try","Próbować","traj"],["Start","Zacząć","start"],["Finish","Skończyć","finysz"],
+["Continue","Kontynuować","kontinju"],["Begin","Rozpocząć","bygin"],["End","Zakończyć","end"],["Call","Zadzwonić","kol"],
+["Text","Napisać SMS","tekst"],["Check","Sprawdzić","czek"],["Send","Wysłać","send"],["Receive","Otrzymać","risiw"],
+["Meet","Spotkać","mit"],["Leave","Wyjść / wyjechać","liw"],["Arrive","Przyjechać / przybyć","eraiw"],["Depart","Odjechać","dipart"],
+["Enter","Wejść","enter"],["Exit","Wyjść","egzyt"],["Sit","Siedzieć","syt"],["Stand","Stać","stend"],["Walk","Chodzić","łok"],
+["Run","Biec","ran"],["Follow","Podążać","folłoł"],["Lead","Prowadzić","lid"],["Push","Pchać","pusz"],["Pull","Ciągnąć","pul"],
+["Lift","Podnieść","lyft"],["Drop","Upuścić","drop"],["Break","Zepsuć / złamać","brejk"],["Fix","Naprawić","fyks"],
+["Clean","Sprzątać","klin"],["Wash","Myć","łosz"],["Fill","Napełnić","fyl"],["Empty","Opróżnić","empti"],
+["Charge","Ładować","czardż"],["Turn on","Włączyć","tern on"],["Turn off","Wyłączyć","tern of"],["Work","Działać / pracować","łork"],
+["Happen","Zdarzyć się","hepen"],["Change","Zmienić","czejndż"],["Cancel","Anulować","kensel"],["Confirm","Potwierdzić","konferm"],
+["Book","Zarezerwować","buk"],["Choose","Wybrać","czuz"],["Decide","Zdecydować","disajd"],["Remember","Pamiętać","rimember"],
+["Forget","Zapomnieć","forget"],["Think","Myśleć","fynk"],["Feel","Czuć","fil"],["Believe","Wierzyć","biliw"],
+["Hope","Mieć nadzieję","houp"],["Like","Lubić","lajk"],["Love","Kochać","law"],["Hate","Nienawidzić","hejt"],
+["Prefer","Preferować","prifer"],["Suggest","Sugerować","sadżest"],["Recommend","Polecać","rekomend"],
+["Allow","Pozwolić","elał"],["Refuse","Odmówić","rifjuz"]
+]},
+adj:{label:"Przymiotniki", icon:"🎨", words:[
+["Good","Dobry","gud"],["Bad","Zły","bed"],["Big","Duży","byg"],["Small","Mały","smol"],["Fast","Szybki","fast"],
+["Slow","Wolny","słoł"],["New","Nowy","nju"],["Old","Stary","ould"],["Young","Młody","jang"],["Long","Długi","long"],
+["Short","Krótki","szort"],["High","Wysoki","haj"],["Low","Niski","loł"],["Near","Bliski","nijer"],["Far","Daleki","far"],
+["Early","Wczesny","erli"],["Late","Późny","lejt"],["Easy","Łatwy","izi"],["Difficult","Trudny","difikelt"],
+["Safe","Bezpieczny","sejf"],["Dangerous","Niebezpieczny","dejndżeres"],["Clean","Czysty","klin"],["Dirty","Brudny","derti"],
+["Full","Pełny","ful"],["Empty","Pusty","empti"],["Open","Otwarty","oupen"],["Closed","Zamknięty","kloułzd"],
+["Free","Wolny / darmowy","fri"],["Busy","Zajęty","byzi"],["Quiet","Cichy","kłajet"],["Loud","Głośny","lałd"],
+["Hot","Gorący","hot"],["Cold","Zimny","kould"],["Warm","Ciepły","łorm"],["Cool","Chłodny","kul"],["Wet","Mokry","łet"],
+["Dry","Suchy","draj"],["Heavy","Ciężki","hewi"],["Light","Lekki","lajt"],["Strong","Silny","strong"],["Weak","Słaby","łik"],
+["Happy","Szczęśliwy","hepi"],["Sad","Smutny","sed"],["Tired","Zmęczony","tajerd"],["Hungry","Głodny","hangri"],
+["Thirsty","Spragniony","ferzti"],["Sick","Chory","syk"],["Comfortable","Wygodny","kamfterbl"],["Uncomfortable","Niewygodny","ankamfterbl"],
+["Friendly","Przyjazny","frendli"],["Polite","Uprzejmy","polajt"],["Rude","Niegrzeczny","rud"],["Patient","Cierpliwy","pejszent"],
+["Nervous","Zdenerwowany","nerwes"],["Calm","Spokojny","kalm"],["Angry","Zły / wściekły","engri"],["Important","Ważny","important"],
+["Correct","Poprawny","korekt"],["Wrong","Błędny","rong"],["Possible","Możliwy","posibl"],["Impossible","Niemożliwy","imposibl"],
+["Ready","Gotowy","redi"],["Available","Dostępny","eweilebl"],["Expensive","Drogi","ikspensiw"],["Cheap","Tani","czip"],
+["Similar","Podobny","similar"],["Different","Inny","diferent"],["Same","Taki sam","sejm"],["Enough","Wystarczający","inaf"]
+]},
+noun:{label:"Rzeczowniki", icon:"📦", words:[
+["Time","Czas","tajm"],["Day","Dzień","dej"],["Week","Tydzień","łik"],["Money","Pieniądze","mani"],["Work","Praca","łork"],
+["Home","Dom","hołm"],["Family","Rodzina","femili"],["Friend","Przyjaciel","frend"],["Person","Osoba","person"],
+["People","Ludzie","pipl"],["Child","Dziecko","czajld"],["Children","Dzieci","czyldren"],["Man","Mężczyzna","men"],
+["Woman","Kobieta","łumen"],["Water","Woda","łoter"],["Food","Jedzenie","fud"],["Phone","Telefon","foun"],["Bag","Torba","beg"],
+["Luggage","Bagaż","lagydż"],["Suitcase","Walizka","sutkejs"],["Umbrella","Parasol","ambrela"],["Wallet","Portfel","łalet"],
+["Ticket","Bilet","tykyt"],["Document","Dokument","dokjument"],["Passport","Paszport","pasport"],
+["Identification","Dowód tożsamości","ajdentifikejszyn"],["Name","Imię","nejm"],["Number","Numer","namber"],
+["Question","Pytanie","kłesczyn"],["Answer","Odpowiedź","anser"],["Problem","Problem","problem"],["Solution","Rozwiązanie","solluszyn"],
+["Reason","Powód","rizn"],["Plan","Plan","plen"],["Idea","Pomysł","ajdija"],["Information","Informacja","informejszyn"],
+["Message","Wiadomość","mesydż"],["Call","Rozmowa telefoniczna","kol"],["Meeting","Spotkanie","mitin"],
+["Appointment","Umówione spotkanie","epointment"],["Trip","Podróż","trip"],["Ride","Kurs / przejazd","rajd"],
+["Driver","Kierowca","drajwer"],["Passenger","Pasażer","pesyndżer"],["Customer","Klient","kastomer"],["Route","Trasa","rut"],
+["Destination","Cel podróży","destinejszyn"],["Location","Lokalizacja","lołkejszyn"],["Distance","Odległość","distens"],
+["Speed","Prędkość","spid"],["Direction","Kierunek","direkszyn"],["Map","Mapa","mep"],["Sign","Znak","sajn"],
+["Rule","Zasada","rul"],["Law","Prawo","lo"],["Service","Usługa","serwis"],["App","Aplikacja","ep"],["Account","Konto","ekałnt"],
+["Rating","Ocena","rejtin"],["Review","Recenzja","riwju"],["Star","Gwiazdka","star"],["Feedback","Opinia zwrotna","fidbek"],
+["Company","Firma","kampani"],["Job","Praca / zawód","dżob"],["Schedule","Harmonogram","skedżul"],["Break","Przerwa","brejk"],
+["Shift","Zmiana (praca)","szyft"],["Income","Dochód","inkam"],["Expense","Wydatek","ikspens"],["Fuel","Paliwo","fjuel"],
+["Insurance","Ubezpieczenie","inszurens"],["License","Prawo jazdy","lajsens"],["Registration","Rejestracja","redżystrejszyn"],
+["Inspection","Przegląd techniczny","inspekszyn"],["Weather","Pogoda","łeder"],["News","Wiadomości","njuz"],
+["Music","Muzyka","mjuzik"],["Song","Piosenka","song"],["Noise","Hałas","nojz"],["Smell","Zapach","smel"],["Light","Światło","lajt"],
+["Darkness","Ciemność","darknes"],["Sun","Słońce","san"],["Moon","Księżyc","mun"],["Star (sky)","Gwiazda","star"]
+]},
+extra:{label:"Zwroty dodatkowe", icon:"✨", words:[
+["Is this seat taken?","Czy to miejsce jest zajęte?","iz dis sit tejken"],["Please buckle up","Proszę zapiąć pasy","pliz bakl ap"],
+["We've arrived","Dojechaliśmy","łiw eraiwd"],["We're almost there","Prawie jesteśmy na miejscu","łier olmoust der"],
+["Five more minutes","Jeszcze pięć minut","fajw mor minits"],["This is your stop","To pana / pani przystanek","dis iz jor stop"],
+["Here we are","Jesteśmy na miejscu","hijer łi ar"],["Do you need help with your bags?","Pomóc z bagażami?","du ju nid help łyf jor begs"],
+["Let me help you","Pozwól, że pomogę","let mi help ju"],["Watch your step","Uważaj na stopień","łocz jor step"],
+["Mind the gap","Uważaj na szczelinę","majnd de gep"],["Please close the door","Proszę zamknąć drzwi","pliz klołz de dor"],
+["Please don't slam the door","Proszę nie trzaskać drzwiami","pliz dołnt slem de dor"],["Rate your trip","Oceń swój kurs","rejt jor trip"],
+["Five stars, please","Proszę o pięć gwiazdek","fajw stars pliz"],["Thanks for riding with me","Dziękuję za podróż ze mną","fenks for rajdin łyf mi"],
+["I hope you enjoyed the ride","Mam nadzieję, że podróż się podobała","aj houp ju endżojd de rajd"],
+["Text me when you're ready","Napisz, kiedy będziesz gotowy","tekst mi łen jor redi"],["I'm outside","Jestem na zewnątrz","ajm ałtsajd"],
+["I'm here","Jestem tutaj","ajm hijer"],["I'm five minutes away","Będę za pięć minut","ajm fajw minits ełej"],
+["I'm right here","Jestem tuż tutaj","ajm rajt hijer"],["What color is your car?","Jaki kolor ma twój samochód?","łot kaler iz jor kar"],
+["It's a silver car","To srebrny samochód","its e silwer kar"],["License plate number","Numer rejestracyjny","lajsens plejt namber"],
+["Can you confirm your name?","Możesz potwierdzić imię?","ken ju konferm jor nejm"],["Is this for...?","Czy to dla...?","iz dis for"],
+["Yes, that's me","Tak, to ja","jes dets mi"],["Sorry, wrong person","Przepraszam, zła osoba","sorri rong person"],
+["How many passengers?","Ilu pasażerów?","hał meni pesyndżers"],["Just me","Tylko ja","dżast mi"],["Two of us","Nas dwoje","tu of as"],
+["Any stops along the way?","Jakieś przystanki po drodze?","eni stops elong de łej"],["One quick stop","Jeden krótki przystanek","łan kłyk stop"],
+["I'll wait for you","Poczekam na ciebie","ajl łejt for ju"],["Take your time, no rush","Nie spiesz się","tejk jor tajm noł rasz"],
+["Can I ask you a favor?","Mogę cię o coś poprosić?","ken aj ask ju e fejwer"],["Sure, go ahead","Jasne, śmiało","szur gol ehed"],
+["No problem at all","Żaden problem","noł problem et ol"],["I appreciate it","Doceniam to","aj eprisziejt it"],
+["That's very kind","To bardzo miłe","dets weri kajnd"],["Have a good one","Miłego dnia","hew e gud łan"],
+["Drive safe","Jedź ostrożnie","drajw sejf"],["See you next time","Do zobaczenia następnym razem","si ju nekst tajm"],
+["I'll be right back","Zaraz wracam","ajl bi rajt bek"],["Give me a second","Daj mi chwilę","giw mi e sekend"],
+["Almost done","Prawie skończone","olmoust dan"],["All set","Wszystko gotowe","ol set"],["Let's go","Jedźmy","lets gol"],
+["After you","Po tobie","after ju"],["Here you go","Proszę bardzo","hijer ju gol"],["This way","Tędy","dis łej"],
+["That way","Tamtędy","det łej"],["Right this way","Właśnie tędy","rajt dis łej"],["No rush","Bez pośpiechu","noł rasz"],
+["Take care now","Trzymaj się","tejk keer nał"],["Safe travels","Bezpiecznej podróży","sejf trewls"],
+["Enjoy the rest of your day","Miłego dalszego dnia","endżoj de rest of jor dej"],["Nice talking to you","Miło było porozmawiać","najs tokin tu ju"],
+["Anything else?","Coś jeszcze?","enifing els"],["That's all","To wszystko","dets ol"]
+]},
+app:{label:"Aplikacja i obsługa klienta", icon:"📱", words:[
+["Your ride is confirmed","Twój kurs jest potwierdzony","jor rajd iz konfermd"],
+["Driver is arriving","Kierowca dojeżdża","drajwer iz eraiwin"],["Trip started","Kurs się rozpoczął","tryp startyd"],
+["Trip completed","Kurs zakończony","tryp kompliityd"],["Please rate your driver","Proszę oceń kierowcę","pliz rejt jor drajwer"],
+["Add a tip","Dodaj napiwek","ed e typ"],["Share my trip","Udostępnij mój kurs","szer maj tryp"],
+["Estimated time of arrival","Szacowany czas przyjazdu","estimejtyd tajm of eraiwel"],
+["Pickup point","Miejsce odbioru","pikap point"],["Drop-off point","Miejsce docelowe","drop-of point"],
+["App notification","Powiadomienie w aplikacji","ep noutyfikejszyn"],["Update the app","Zaktualizuj aplikację","apdejt di ep"],
+["The app crashed","Aplikacja się zawiesiła","di ep kreszd"],["I can't see my driver","Nie widzę kierowcy","aj kent si maj drajwer"],
+["Wrong pickup location","Zła lokalizacja odbioru","rong pikap lołkejszyn"],["Customer support","Obsługa klienta","kastomer sapport"],
+["File a complaint","Złożyć skargę","fajl e kompleint"],["Leave a compliment","Zostawić komplement","liw e komplyment"],
+["Five-star rating","Ocena pięciu gwiazdek","fajw star rejtin"],["One-star rating","Ocena jednej gwiazdki","łan star rejtin"],
+["Report an issue","Zgłosić problem","riport en yszju"],["Contact support","Skontaktować się z pomocą","kontakt sapport"],
+["Chat with support","Czat z pomocą","czat łyf sapport"],["Live chat","Czat na żywo","lajw czat"],
+["In-app messaging","Wiadomości w aplikacji","in-ep mesydżin"],["Verify your identity","Zweryfikuj tożsamość","werifaj jor ajdentiti"],
+["Update your profile","Zaktualizuj profil","apdejt jor proufajl"],["Add a payment method","Dodaj metodę płatności","ed e pejmynt mefod"],
+["Remove a card","Usuń kartę","rimuw e kard"],["Default payment","Domyślna płatność","difolt pejmynt"],
+["Promo applied","Kod promocyjny zastosowany","promoł eplajd"],["Referral code","Kod polecający","riferel koud"],
+["Invite a friend","Zaproś znajomego","inwajt e frend"],["Trip history","Historia kursów","tryp hystori"],
+["Saved places","Zapisane miejsca","sejwd plejsys"],["Favorite destination","Ulubiony cel podróży","fejwerit destinejszyn"],
+["Set a reminder","Ustaw przypomnienie","set e rimajnder"],["Turn on notifications","Włącz powiadomienia","tern on noutyfikejszyns"]
+]}
+};
+
+/* ================= DIALOGUES DATA ================= */
+const DIALOGUES = {
+pickup:{label:"Początek kursu", icon:"🚖", lines:[
+  {who:'passenger', en:"Hi, are you my driver?", pl:"Cześć, czy to pan jest moim kierowcą?"},
+  {who:'driver', en:"Yes, that's me. Nice to meet you!", pl:"Tak, to ja. Miło cię poznać!"},
+  {who:'driver', en:"Where do you want to go?", pl:"Dokąd chcesz jechać?"},
+  {who:'passenger', en:"To the airport, please.", pl:"Na lotnisko, proszę."},
+  {who:'driver', en:"No problem. Please buckle up.", pl:"Żaden problem. Proszę zapiąć pasy."},
+  {who:'passenger', en:"How long will it take?", pl:"Jak długo to potrwa?"},
+  {who:'driver', en:"About twenty minutes, there's a bit of traffic.", pl:"Około dwudziestu minut, jest trochę korków."},
+  {who:'passenger', en:"Okay, no rush.", pl:"Dobrze, bez pośpiechu."}
+]},
+smalltalk:{label:"Small talk w trasie", icon:"💬", lines:[
+  {who:'driver', en:"How's your day going?", pl:"Jak mija dzień?"},
+  {who:'passenger', en:"Pretty good, thanks. And yours?", pl:"Całkiem nieźle, dzięki. A twój?"},
+  {who:'driver', en:"Busy, but I can't complain.", pl:"Ruchliwy, ale nie narzekam."},
+  {who:'driver', en:"Are you visiting the city?", pl:"Zwiedzasz miasto?"},
+  {who:'passenger', en:"Yes, it's my first time here.", pl:"Tak, jestem tu pierwszy raz."},
+  {who:'driver', en:"Do you have any plans for today?", pl:"Masz jakieś plany na dziś?"},
+  {who:'passenger', en:"Just a business meeting downtown.", pl:"Tylko spotkanie biznesowe w centrum."},
+  {who:'driver', en:"Would you like some music, or is quiet okay?", pl:"Chcesz muzykę, czy cisza jest w porządku?"},
+  {who:'passenger', en:"Quiet is fine, thank you.", pl:"Cisza jest ok, dziękuję."}
+]},
+problem:{label:"Problem w trasie", icon:"🚧", lines:[
+  {who:'driver', en:"I'm sorry, there's a lot of traffic today.", pl:"Przepraszam, dziś jest duży korek."},
+  {who:'passenger', en:"No worries, take your time.", pl:"Nie ma sprawy, nie spiesz się."},
+  {who:'driver', en:"The road ahead is closed. I need to reroute.", pl:"Droga z przodu jest zamknięta. Muszę zmienić trasę."},
+  {who:'passenger', en:"That's fine, is it a big detour?", pl:"W porządku, to duży objazd?"},
+  {who:'driver', en:"Just a few extra minutes, no problem.", pl:"Tylko kilka dodatkowych minut, żaden problem."},
+  {who:'passenger', en:"Okay, thanks for letting me know.", pl:"Dobrze, dzięki za informację."},
+  {who:'driver', en:"We'll still arrive close to the estimated time.", pl:"I tak dojedziemy blisko szacowanego czasu."}
+]},
+payment:{label:"Płatność", icon:"💳", lines:[
+  {who:'driver', en:"Here we are. That's the destination.", pl:"Jesteśmy na miejscu. To ten adres."},
+  {who:'passenger', en:"Great, how much is it?", pl:"Super, ile płacę?"},
+  {who:'driver', en:"The app shows the total, it's already charged to your card.", pl:"Aplikacja pokazuje sumę, karta już obciążona."},
+  {who:'passenger', en:"Can I add a tip?", pl:"Mogę dodać napiwek?"},
+  {who:'driver', en:"Sure, you can do it in the app after the ride.", pl:"Jasne, możesz to zrobić w aplikacji po kursie."},
+  {who:'driver', en:"Do you need a receipt?", pl:"Potrzebujesz paragonu?"},
+  {who:'driver', en:"The app sends it automatically to your email.", pl:"Aplikacja wysyła go automatycznie na e-mail."}
+]},
+dropoff:{label:"Koniec kursu", icon:"👋", lines:[
+  {who:'driver', en:"We've arrived, here we are.", pl:"Dojechaliśmy, jesteśmy na miejscu."},
+  {who:'driver', en:"Do you need help with your bags?", pl:"Pomóc z bagażami?"},
+  {who:'passenger', en:"No thanks, I've got it.", pl:"Nie, dziękuję, dam radę."},
+  {who:'driver', en:"Watch your step getting out.", pl:"Uważaj wysiadając."},
+  {who:'passenger', en:"Thanks for the ride, drive safe!", pl:"Dzięki za kurs, jedź ostrożnie!"},
+  {who:'driver', en:"Thank you, have a great day. Five stars, please!", pl:"Dziękuję, miłego dnia. Proszę o pięć gwiazdek!"},
+  {who:'passenger', en:"Of course, take care!", pl:"Jasne, trzymaj się!"}
+]}
+};
+
+const CAT_KEYS = Object.keys(DATA);
+const TOTAL_WORDS = CAT_KEYS.reduce((s,k)=>s+DATA[k].words.length,0);
+
+/* ================= STATE ================= */
+let state = {
+  view:"home",
+  cat:null,
+  idx:0,
+  flipped:false,
+  deck:[],
+  known:new Set(),
+  reviews:{},
+  stats:{reviewed:0, correct:0, streak:0, lastStudyDate:null},
+  toast:null,
+  quiz:{questions:[], idx:0, score:0, answered:false, picked:null},
+  dialogKey:null
+};
+
+/* ================= STORAGE ================= */
+const STORAGE_KEY = 'driveEnglish.progress.v2';
+async function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('driveEnglish.progress');
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    state.known = new Set(Array.isArray(parsed.known) ? parsed.known : []);
+    state.reviews = parsed.reviews && typeof parsed.reviews === 'object' ? parsed.reviews : {};
+    state.stats = {...state.stats, ...(parsed.stats || {})};
+  }catch(e){ console.warn('Nie udało się odczytać postępu:', e); }
+}
+async function saveProgress(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({known:Array.from(state.known), reviews:state.reviews, stats:state.stats, version:2}));
+  }catch(e){ console.error('Nie udało się zapisać postępu:', e); }
+}
+function wordKey(cat,en){ return cat+'|'+en; }
+function localDateKey(d=new Date()){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function updateStudyStreak(){
+  const today=localDateKey();
+  if(state.stats.lastStudyDate===today) return;
+  const yesterday=new Date(); yesterday.setDate(yesterday.getDate()-1);
+  state.stats.streak = state.stats.lastStudyDate===localDateKey(yesterday) ? (state.stats.streak||0)+1 : 1;
+  state.stats.lastStudyDate=today;
+}
+function reviewWord(w, known){
+  const key=wordKey(w.cat,w.en), now=Date.now();
+  const r=state.reviews[key] || {box:0, seen:0, correct:0, due:0};
+  r.seen++; state.stats.reviewed++; updateStudyStreak();
+  if(known){
+    r.correct++; state.stats.correct++; r.box=Math.min(5,(r.box||0)+1);
+    const intervals=[0,10*60e3,24*60*60e3,3*24*60*60e3,7*24*60*60e3,21*24*60*60e3];
+    r.due=now+intervals[r.box]; state.known.add(key);
+  }else{ r.box=0; r.due=now+2*60e3; state.known.delete(key); }
+  state.reviews[key]=r;
+}
+function dueScore(w){
+  const r=state.reviews[wordKey(w.cat,w.en)];
+  return r ? (r.due||0)-Date.now() : -1e15;
+}
+function prioritizedDeck(words){
+  const unseen=shuffle(words.filter(w=>!state.reviews[wordKey(w.cat,w.en)]));
+  const due=words.filter(w=>state.reviews[wordKey(w.cat,w.en)] && dueScore(w)<=0).sort((a,b)=>dueScore(a)-dueScore(b));
+  const later=shuffle(words.filter(w=>state.reviews[wordKey(w.cat,w.en)] && dueScore(w)>0));
+  return [...due,...unseen,...later];
+}
+function showToast(msg){ state.toast=msg; render(); setTimeout(()=>{state.toast=null; render();},1800); }
+function resetProgress(){
+  if(!confirm('Czy na pewno wyzerować cały postęp nauki?')) return;
+  state.known=new Set(); state.reviews={}; state.stats={reviewed:0,correct:0,streak:0,lastStudyDate:null};
+  try{
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('driveEnglish.progress');
+  }catch(e){}
+  showToast('Postęp został wyzerowany');
+}
+
+/* ================= AUDIO ================= */
+let speechVoices = [];
+let activeUtterance = null;
+let dialogPlaybackToken = 0;
+function refreshVoices(){
+  if('speechSynthesis' in window) speechVoices = window.speechSynthesis.getVoices() || [];
+}
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+function englishVoice(){
+  refreshVoices();
+  const english=speechVoices.filter(v=>/^en/i.test(v.lang));
+  if(!english.length) return null;
+  const preferredNames=/samantha|ava|aaron|daniel|serena|jamie|siri|enhanced|premium/i;
+  return english.sort((a,b)=>{
+    const score=v=>
+      (preferredNames.test(v.name) ? 100 : 0) +
+      (/^en-US$/i.test(v.lang) ? 30 : 0) +
+      (/^en-GB$/i.test(v.lang) ? 20 : 0) +
+      (v.localService ? 10 : 0);
+    return score(b)-score(a);
+  })[0];
+}
+function speak(text, options={}){
+  return new Promise(resolve=>{
+    if(!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)){
+      showToast('Audio nie jest dostępne w tej przeglądarce');
+      resolve(false);
+      return;
+    }
+    const synth=window.speechSynthesis;
+    refreshVoices();
+    const u=new SpeechSynthesisUtterance(String(text));
+    activeUtterance=u;
+    u.lang='en-GB';
+    const voice=englishVoice();
+    if(voice){ u.voice=voice; u.lang=voice.lang; }
+    u.rate=0.92; u.pitch=0.98; u.volume=1;
+    u.onend=()=>{
+      if(activeUtterance===u) activeUtterance=null;
+      resolve(true);
+    };
+    u.onerror=(event)=>{
+      if(activeUtterance===u) activeUtterance=null;
+      const reason=event.error || '';
+      if(reason!=='canceled' && reason!=='interrupted'){
+        showToast('Nie udało się odtworzyć głosu');
+      }
+      resolve(false);
+    };
+
+    const replaceCurrent = options.cancel!==false && (synth.speaking || synth.pending);
+    if(replaceCurrent) synth.cancel();
+
+    const startSpeaking=()=>{
+      synth.resume();
+      synth.speak(u);
+      setTimeout(()=>{ if(synth.paused) synth.resume(); },120);
+    };
+
+    // iPhone wymaga startu bezpośrednio po dotknięciu. Na Macu silnik
+    // potrzebuje natomiast krótkiej przerwy tylko wtedy, gdy przed chwilą
+    // anulowano inną wypowiedź.
+    const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(replaceCurrent && !isiPhone) setTimeout(startSpeaking,60);
+    else startSpeaking();
+  });
+}
+function stopSpeech(){
+  dialogPlaybackToken++;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+/* ================= THEME ================= */
+const THEME_KEY='driveEnglish.theme';
+function preferredTheme(){
+  try{
+    const saved=localStorage.getItem(THEME_KEY);
+    if(saved==='light'||saved==='dark') return saved;
+  }catch(e){}
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+function applyTheme(theme){
+  document.documentElement.dataset.theme=theme;
+  const meta=document.getElementById('themeColorMeta');
+  const status=document.getElementById('statusBarMeta');
+  if(meta) meta.content=theme==='light'?'#F4F6F8':'#12151A';
+  if(status) status.content=theme==='light'?'default':'black-translucent';
+}
+function toggleTheme(){
+  const next=document.documentElement.dataset.theme==='light'?'dark':'light';
+  applyTheme(next);
+  try{localStorage.setItem(THEME_KEY,next);}catch(e){}
+  render();
+}
+applyTheme(preferredTheme());
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function catKnownCount(catKey){
+  let c=0;
+  DATA[catKey].words.forEach(w=>{ if(state.known.has(wordKey(catKey,w[0]))) c++; });
+  return c;
+}
+function totalKnownCount(){
+  return state.known.size;
+}
+
+/* ================= RENDER ================= */
+const app = document.getElementById('app');
+
+function render(){
+  let html = '';
+  if(state.view==='home') html = renderHome();
+  else if(state.view==='lesson') html = renderLesson();
+  else if(state.view==='quizSetup') html = renderQuizSetup();
+  else if(state.view==='quiz') html = renderQuiz();
+  else if(state.view==='quizResult') html = renderQuizResult();
+  else if(state.view==='progress') html = renderProgress();
+  else if(state.view==='dialogSetup') html = renderDialogSetup();
+  else if(state.view==='dialog') html = renderDialog();
+
+  app.innerHTML = `
+    <div class="topbar">
+      ${state.view==='home' ? `
+        <div class="brand">
+          <div class="brand-mark">D</div>
+          <div>
+            <div class="brand-text">DriveEnglish</div>
+            <div class="brand-sub">ANGIELSKI ZA KÓŁKIEM</div>
+          </div>
+        </div>
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Zmień motyw">${document.documentElement.dataset.theme==='light'?'🌙':'☀️'}</button>
+      ` : `
+        <button class="back-btn" onclick="goHome()"><span class="chevron">‹</span>Start</button>
+        <div class="brand-text">${topbarTitle()}</div>
+        <button class="theme-btn" onclick="toggleTheme()" aria-label="Zmień motyw">${document.documentElement.dataset.theme==='light'?'🌙':'☀️'}</button>
+      `}
+    </div>
+    <div class="screen">${html}</div>
+    ${state.toast ? `<div class="toast">${state.toast}</div>` : ''}
+    <div class="bottom-nav">
+      <button class="nav-item ${state.view==='home'?'active':''}" onclick="goHome()"><span class="ic">🏠</span><span class="lb">Start</span></button>
+      <button class="nav-item ${state.view==='lesson'?'active':''}" onclick="continueLearning()"><span class="ic">🗂️</span><span class="lb">Fiszki</span></button>
+      <button class="nav-item ${state.view==='quizSetup'||state.view==='quiz'||state.view==='quizResult'?'active':''}" onclick="goQuizSetup()"><span class="ic">❓</span><span class="lb">Quiz</span></button>
+      <button class="nav-item ${state.view==='dialogSetup'||state.view==='dialog'?'active':''}" onclick="goDialogSetup()"><span class="ic">🎭</span><span class="lb">Dialogi</span></button>
+      <button class="nav-item ${state.view==='progress'?'active':''}" onclick="goProgress()"><span class="ic">📊</span><span class="lb">Postępy</span></button>
+      <div class="home-indicator"></div>
+    </div>
+  `;
+  if(state.view==='lesson'){
+    setupSwipe();
+    autoSpeakCurrentCard();
+  }
+}
+
+let lastSpokenKey = null;
+function autoSpeakCurrentCard(){
+  const w = state.deck[state.idx];
+  if(!w) return;
+  const key = state.cat + '|' + w.en + '|' + state.idx + '|' + state.deck.length;
+  if(key !== lastSpokenKey){
+    lastSpokenKey = key;
+    speak(w.en);
+  }
+}
+
+function topbarTitle(){
+  if(state.view==='lesson') return state.cat ? DATA[state.cat].label : 'Mix wszystkich';
+  if(state.view==='quizSetup') return 'Quiz';
+  if(state.view==='quiz') return 'Quiz';
+  if(state.view==='quizResult') return 'Wynik';
+  if(state.view==='progress') return 'Postępy';
+  if(state.view==='dialogSetup') return 'Dialogi';
+  if(state.view==='dialog') return state.dialogKey ? DIALOGUES[state.dialogKey].label : 'Dialog';
+  return '';
+}
+
+/* ---- HOME ---- */
+function renderHome(){
+  const known = totalKnownCount();
+  const pct = Math.round((known/TOTAL_WORDS)*100);
+  let cards = CAT_KEYS.map(k=>{
+    const cat = DATA[k];
+    const kc = catKnownCount(k);
+    const p = Math.round((kc/cat.words.length)*100);
+    return `
+      <div class="cat-card" onclick="openCategory('${k}')">
+        <div class="cat-icon">${cat.icon}</div>
+        <div class="cat-name">${cat.label}</div>
+        <div class="cat-count">${kc}/${cat.words.length} poznanych</div>
+        <div class="cat-bar"><div class="cat-bar-fill" style="width:${p}%"></div></div>
+      </div>`;
+  }).join('');
+
+  const accuracy = state.stats.reviewed ? Math.round((state.stats.correct/state.stats.reviewed)*100) : 0;
+  return `
+    <div class="daily-card"><div class="daily-row">
+      <div><div class="daily-num">${state.stats.streak || 0} dni</div><div class="mini-label">seria nauki</div></div>
+      <div><div class="daily-num">${state.stats.reviewed || 0}</div><div class="mini-label">powtórek</div></div>
+      <div><div class="daily-num">${accuracy}%</div><div class="mini-label">trafności</div></div>
+    </div></div>
+    <div class="gauge-card">
+      ${gaugeSvg(pct)}
+      <div>
+        <div class="gauge-label">Postęp ogólny</div>
+        <div class="gauge-num">${known} / ${TOTAL_WORDS}</div>
+        <div class="gauge-sub">słów i zwrotów poznanych</div>
+      </div>
+    </div>
+    <div class="mix-card" onclick="startMix()">
+      <div>
+        <div class="cat-name">🔀 Mix wszystkich kategorii</div>
+        <div class="cat-count">Losowe fiszki ze wszystkich ${TOTAL_WORDS} pozycji</div>
+      </div>
+      <div style="font-size:20px;">→</div>
+    </div>
+    <div class="section-title">Kategorie</div>
+    <div class="cat-grid">${cards}</div>
+  `;
+}
+
+function gaugeSvg(pct){
+  const r=34, c=2*Math.PI*r;
+  const off = c - (pct/100)*c;
+  return `
+  <svg width="86" height="86" viewBox="0 0 86 86">
+    <circle cx="43" cy="43" r="${r}" stroke="var(--line)" stroke-width="9" fill="none"/>
+    <circle cx="43" cy="43" r="${r}" stroke="var(--accent)" stroke-width="9" fill="none"
+      stroke-dasharray="${c}" stroke-dashoffset="${off}" stroke-linecap="round"
+      transform="rotate(-90 43 43)"/>
+    <text x="43" y="49" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="18" fill="var(--text)">${pct}%</text>
+  </svg>`;
+}
+
+function openCategory(k){
+  stopSpeech();
+  state.cat = k;
+  state.deck = prioritizedDeck(DATA[k].words.map(w=>({...wordObj(w), cat:k})));
+  state.idx = 0; state.flipped = false;
+  lastSpokenKey = null;
+  state.view = 'lesson';
+  render();
+}
+function startMix(){
+  stopSpeech();
+  let all = [];
+  CAT_KEYS.forEach(k=> DATA[k].words.forEach(w=> all.push({...wordObj(w), cat:k})));
+  state.cat = null;
+  state.deck = prioritizedDeck(all);
+  state.idx = 0; state.flipped = false;
+  lastSpokenKey = null;
+  state.view = 'lesson';
+  render();
+}
+function continueLearning(){
+  stopSpeech();
+  if(state.deck.length && state.idx < state.deck.length-1){
+    state.idx++;
+    state.flipped=false;
+    state.view='lesson';
+    render();
+  }else{
+    startMix();
+  }
+}
+function wordObj(w){ return {en:w[0], pl:w[1], phon:w[2]}; }
+function goHome(){ stopSpeech(); state.view='home'; render(); }
+
+/* ---- LESSON / FLASHCARDS ---- */
+function renderLesson(){
+  if(state.deck.length===0) return `<div class="empty">Brak słówek w tej kategorii.</div>`;
+  const w = state.deck[state.idx];
+  const pct = Math.round(((state.idx+1)/state.deck.length)*100);
+  const isKnown = state.known.has(wordKey(w.cat, w.en));
+  return `
+    <div class="card-count">${state.idx+1} / ${state.deck.length}</div>
+    <div class="progress-track" style="margin-bottom:16px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="flash-wrap">
+      <div class="swipe-badge badge-left" id="badgeRepeat">↻ POWTÓRZ</div>
+      <div class="swipe-badge badge-right" id="badgeKnow">✓ ZNAM</div>
+      <div class="swipe-layer" id="swipeLayer">
+        <div class="flash-card ${state.flipped?'flipped':''}" onclick="flipCard()">
+          <div class="face face-front">
+            <button class="audio-btn" onclick="event.stopPropagation(); speak('${escJs(w.en)}')">🔊</button>
+            <div class="en-word">${w.en}</div>
+            <div class="phon">/ ${w.phon} /</div>
+            <div class="tap-hint">${isKnown?'✓ ZNASZ TO SŁOWO':'DOTKNIJ, ABY ZOBACZYĆ TŁUMACZENIE'}</div>
+          </div>
+          <div class="face face-back">
+            <div class="pl-word">${w.pl}</div>
+            <div class="tap-hint" style="margin-top:18px;">${w.en}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="act-btn act-repeat" onclick="markCard(false)">↻ Powtórz</button>
+      <button class="act-btn act-know" onclick="markCard(true)">✓ Znam</button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="prevCard()">‹ Poprzednia</button>
+      <button class="nav-btn" onclick="nextCard()">Następna ›</button>
+    </div>
+    <div class="tap-hint" style="text-align:center; margin-top:10px;">PRZESUŃ W PRAWO = ZNAM · W LEWO = POWTÓRZ</div>
+  `;
+}
+function escJs(s){ return s.replace(/'/g, "\\'"); }
+let suppressFlip = false;
+function flipCard(){
+  if(suppressFlip) return;
+  const showingTranslation = !state.flipped;
+  state.flipped = !state.flipped; render();
+  if(showingTranslation){
+    const w=state.deck[state.idx];
+    if(w) speak(w.en);
+  }
+}
+function markCard(known){
+  const w = state.deck[state.idx];
+  const key = wordKey(w.cat, w.en);
+  reviewWord(w, known);
+  saveProgress();
+  nextCard();
+}
+function nextCard(){
+  stopSpeech();
+  if(state.idx < state.deck.length-1){ state.idx++; state.flipped=false; render(); }
+  else { goHome(); }
+}
+function prevCard(){
+  stopSpeech();
+  if(state.idx>0){ state.idx--; state.flipped=false; render(); }
+}
+
+/* ---- SWIPE GESTURES ---- */
+function setupSwipe(){
+  const layer = document.getElementById('swipeLayer');
+  if(!layer) return;
+  const know = document.getElementById('badgeKnow');
+  const repeat = document.getElementById('badgeRepeat');
+  let startX=0, startY=0, dx=0, dragging=false, horizontal=false, moved=false;
+
+  function onDown(e){
+    dragging = true; horizontal = false; moved = false; dx = 0;
+    const p = e.touches ? e.touches[0] : e;
+    startX = p.clientX; startY = p.clientY;
+    layer.style.transition = 'none';
+    if(e.pointerId!==undefined){ try{ layer.setPointerCapture(e.pointerId); }catch(err){} }
+  }
+  function onMoveFn(e){
+    if(!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const diffX = p.clientX - startX;
+    const diffY = p.clientY - startY;
+    if(!horizontal && !moved){
+      if(Math.abs(diffX) > 8 || Math.abs(diffY) > 8){
+        horizontal = Math.abs(diffX) > Math.abs(diffY);
+        moved = true;
+      }
+    }
+    if(horizontal){
+      if(e.cancelable) e.preventDefault();
+      dx = diffX;
+      layer.style.transform = `translateX(${dx}px) rotate(${dx/18}deg)`;
+      const t = Math.min(Math.abs(dx)/100, 1);
+      if(dx > 0){ know.style.opacity = t; repeat.style.opacity = 0; }
+      else { repeat.style.opacity = t; know.style.opacity = 0; }
+    }
+  }
+  function onUp(){
+    if(!dragging) return;
+    dragging = false;
+    layer.style.transition = 'transform .3s ease';
+    if(horizontal && Math.abs(dx) > 90){
+      const goRight = dx > 0;
+      layer.style.transform = `translateX(${goRight ? 700 : -700}px) rotate(${goRight ? 28 : -28}deg)`;
+      suppressFlip = true;
+      setTimeout(()=>{ markCard(goRight); suppressFlip = false; }, 180);
+    } else {
+      layer.style.transform = 'translateX(0) rotate(0)';
+      know.style.opacity = 0; repeat.style.opacity = 0;
+      if(horizontal){
+        suppressFlip = true;
+        setTimeout(()=>{ suppressFlip = false; }, 80);
+      }
+    }
+    horizontal = false; dx = 0;
+  }
+
+  if(window.PointerEvent){
+    layer.addEventListener('pointerdown', onDown);
+    layer.addEventListener('pointermove', onMoveFn);
+    layer.addEventListener('pointerup', onUp);
+    layer.addEventListener('pointercancel', onUp);
+  }else{
+    layer.addEventListener('touchstart', onDown, {passive:true});
+    layer.addEventListener('touchmove', onMoveFn, {passive:false});
+    layer.addEventListener('touchend', onUp);
+  }
+}
+
+/* ---- QUIZ ---- */
+function goQuizSetup(){ stopSpeech(); state.view='quizSetup'; render(); }
+function renderQuizSetup(){
+  let opts = CAT_KEYS.map(k=>`<button class="opt-btn" onclick="startQuiz('${k}')">${DATA[k].icon} ${DATA[k].label} (${DATA[k].words.length})</button>`).join('');
+  return `
+    <div class="quiz-prompt">
+      <div class="quiz-tag">TRYB QUIZU</div>
+      <div class="quiz-word" style="font-size:16px;">10 pytań, wybierz kategorię lub zagraj z mixu</div>
+    </div>
+    <button class="primary-btn" style="margin-bottom:14px;" onclick="startQuiz(null)">🔀 Mix wszystkich kategorii</button>
+    <div class="section-title" style="margin-top:6px;">Albo wybierz kategorię</div>
+    <div class="opt-list">${opts}</div>
+  `;
+}
+function startQuiz(catKey){
+  let pool = catKey ? DATA[catKey].words.map(w=>({...wordObj(w)})) : CAT_KEYS.flatMap(k=>DATA[k].words.map(w=>wordObj(w)));
+  pool = shuffle(pool).slice(0, Math.min(10, pool.length));
+  const allWords = catKey ? DATA[catKey].words.map(w=>wordObj(w)) : CAT_KEYS.flatMap(k=>DATA[k].words.map(w=>wordObj(w)));
+  const questions = pool.map(w=>{
+    const direction = Math.random()<0.5 ? 'en2pl' : 'pl2en';
+    const correct = direction==='en2pl' ? w.pl : w.en;
+    let distractors = shuffle(allWords.filter(x=>x.en!==w.en)).slice(0,3).map(x=> direction==='en2pl'?x.pl:x.en);
+    const options = shuffle([correct, ...distractors]);
+    return {word:w, direction, correct, options};
+  });
+  state.quiz = {questions, idx:0, score:0, answered:false, picked:null};
+  state.view='quiz';
+  render();
+}
+function renderQuiz(){
+  const q = state.quiz.questions[state.quiz.idx];
+  const prompt = q.direction==='en2pl' ? q.word.en : q.word.pl;
+  const tag = q.direction==='en2pl' ? 'PRZETŁUMACZ NA POLSKI' : 'TRANSLATE TO ENGLISH';
+  let opts = q.options.map(o=>{
+    let cls='opt-btn';
+    if(state.quiz.answered){
+      if(o===q.correct) cls+=' correct';
+      else if(o===state.quiz.picked) cls+=' wrong';
+    }
+    return `<button class="${cls}" onclick="answerQuiz('${escJs(o)}')">${o}</button>`;
+  }).join('');
+  return `
+    <div class="quiz-progress">Pytanie ${state.quiz.idx+1} / ${state.quiz.questions.length} · Wynik: ${state.quiz.score}</div>
+    <div class="quiz-prompt">
+      <div class="quiz-tag">${tag}</div>
+      <div class="quiz-word">${prompt}</div>
+      ${q.direction==='en2pl' ? `<button class="audio-btn" style="position:static; margin-top:14px;" onclick="speak('${escJs(q.word.en)}')">🔊</button>` : ''}
+    </div>
+    <div class="opt-list">${opts}</div>
+    ${state.quiz.answered ? `<button class="primary-btn" style="margin-top:16px;" onclick="nextQuizQ()">Dalej →</button>` : ''}
+  `;
+}
+function answerQuiz(opt){
+  if(state.quiz.answered) return;
+  state.quiz.answered = true;
+  state.quiz.picked = opt;
+  if(opt===state.quiz.questions[state.quiz.idx].correct) state.quiz.score++;
+  render();
+}
+function nextQuizQ(){
+  if(state.quiz.idx < state.quiz.questions.length-1){
+    state.quiz.idx++; state.quiz.answered=false; state.quiz.picked=null;
+    render();
+  } else {
+    state.view='quizResult'; render();
+  }
+}
+function renderQuizResult(){
+  const total = state.quiz.questions.length;
+  const score = state.quiz.score;
+  const pct = Math.round((score/total)*100);
+  let msg = pct>=80 ? 'Świetna jazda! 🚕' : pct>=50 ? 'Dobra robota, jedź dalej!' : 'Ćwicz dalej, będzie lepiej!';
+  return `
+    <div class="quiz-prompt">
+      <div class="quiz-tag">WYNIK QUIZU</div>
+      <div class="result-num">${score}/${total}</div>
+      <div class="result-sub">${msg}</div>
+      <button class="primary-btn" onclick="goQuizSetup()">Zagraj ponownie</button>
+    </div>
+  `;
+}
+
+/* ---- PROGRESS ---- */
+function goProgress(){ stopSpeech(); state.view='progress'; render(); }
+function renderProgress(){
+  const known = totalKnownCount();
+  const pct = Math.round((known/TOTAL_WORDS)*100);
+  let rows = CAT_KEYS.map(k=>{
+    const cat = DATA[k];
+    const kc = catKnownCount(k);
+    const p = Math.round((kc/cat.words.length)*100);
+    return `
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-name">${cat.icon} ${cat.label}</div>
+          <div class="stat-pct">${p}%</div>
+        </div>
+        <div class="cat-bar" style="margin-top:10px;"><div class="cat-bar-fill" style="width:${p}%"></div></div>
+        <div class="cat-count" style="margin-top:8px;">${kc} / ${cat.words.length} poznanych</div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="gauge-card">
+      ${gaugeSvg(pct)}
+      <div>
+        <div class="gauge-label">Łącznie</div>
+        <div class="gauge-num">${known} / ${TOTAL_WORDS}</div>
+        <div class="gauge-sub">${pct}% ukończone</div>
+      </div>
+    </div>
+    <div class="section-title">Postępy w kategoriach</div>
+    ${rows}
+    <div class="section-title">Dane</div>
+    <button class="secondary-btn danger-btn" onclick="resetProgress()">Wyzeruj postęp</button>
+  `;
+}
+
+/* ---- DIALOGUES ---- */
+const DLG_KEYS = Object.keys(DIALOGUES);
+function goDialogSetup(){ stopSpeech(); state.view='dialogSetup'; render(); }
+function renderDialogSetup(){
+  let cards = DLG_KEYS.map(k=>{
+    const d = DIALOGUES[k];
+    return `
+      <div class="cat-card" style="grid-column:span 2; display:flex; align-items:center; justify-content:space-between; padding:16px 18px;" onclick="openDialog('${k}')">
+        <div>
+          <div class="cat-name" style="margin-top:0;">${d.icon} ${d.label}</div>
+          <div class="cat-count">${d.lines.length} kwestii · kierowca ↔ pasażer</div>
+        </div>
+        <div style="font-size:20px;">→</div>
+      </div>`;
+  }).join('');
+  return `
+    <div class="quiz-prompt">
+      <div class="quiz-tag">DIALOGI</div>
+      <div class="quiz-word" style="font-size:16px;">Przykładowe rozmowy kierowca–pasażer</div>
+    </div>
+    <div class="section-title" style="margin-top:6px;">Wybierz scenariusz</div>
+    <div class="cat-grid" style="grid-template-columns:1fr;">${cards}</div>
+  `;
+}
+function openDialog(k){
+  stopSpeech();
+  state.dialogKey = k;
+  state.view = 'dialog';
+  render();
+}
+function renderDialog(){
+  const d = DIALOGUES[state.dialogKey];
+  let rows = d.lines.map(l=>`
+    <div class="dlg-row dlg-${l.who}">
+      <div class="dlg-tag">${l.who==='driver' ? '🚗 KIEROWCA' : '🧍 PASAŻER'}</div>
+      <div class="dlg-bubble">
+        <div class="dlg-en">${l.en}</div>
+        <div class="dlg-pl">${l.pl}</div>
+        <button class="audio-btn dlg-audio" onclick="speak('${escJs(l.en)}')">🔊</button>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="quiz-prompt" style="margin-bottom:18px; text-align:left;">
+      <div class="quiz-tag">${d.icon} ${d.label.toUpperCase()}</div>
+      <div class="quiz-word" style="font-size:15px; margin-top:8px;">Dotknij 🔊 przy każdej kwestii albo odtwórz cały dialog</div>
+      <button class="primary-btn" style="margin-top:14px;" onclick="playDialog()">▶️ Odtwórz cały dialog</button>
+    </div>
+    <div class="dlg-wrap">${rows}</div>
+  `;
+}
+async function playDialog(){
+  const d=DIALOGUES[state.dialogKey];
+  if(!d) return;
+  const token=++dialogPlaybackToken;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  for(const line of d.lines){
+    if(token!==dialogPlaybackToken) return;
+    const ok=await speak(line.en,{cancel:false});
+    if(!ok || token!==dialogPlaybackToken) return;
+    await new Promise(r=>setTimeout(r,220));
+  }
+}
+
+/* ================= STATUS BAR CLOCK ================= */
+function updateStatusClock(){
+  const el = document.getElementById('statusClock');
+  if(!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
+}
+updateStatusClock();
+setInterval(updateStatusClock, 15000);
+
+/* ================= INIT ================= */
+(async function init(){
+  await loadProgress();
+  render();
+})();
+</script>
+</body>
+</html>
