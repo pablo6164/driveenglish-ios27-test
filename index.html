@@ -257,6 +257,11 @@
   .secondary-btn{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--surface2);color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;cursor:pointer;}
   .danger-btn{color:var(--bad);border-color:rgba(255,107,107,.45);}
   .toast{position:absolute;left:20px;right:20px;bottom:calc(76px + env(safe-area-inset-bottom,18px));z-index:50;background:#262E39;border:1px solid var(--line);border-radius:13px;padding:12px 14px;text-align:center;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.35);}
+  .audio-gate{position:absolute;inset:0;z-index:100;background:rgba(10,13,18,.88);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:28px;}
+  .audio-gate-card{width:100%;max-width:340px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45);}
+  .audio-gate-icon{font-size:44px;margin-bottom:12px;}
+  .audio-gate-title{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;}
+  .audio-gate-copy{color:var(--muted);font-size:13px;line-height:1.5;margin:10px 0 20px;}
 </style>
 </head>
 <body>
@@ -624,6 +629,8 @@ dropoff:{label:"Koniec kursu", icon:"👋", lines:[
 
 const CAT_KEYS = Object.keys(DATA);
 const TOTAL_WORDS = CAT_KEYS.reduce((s,k)=>s+DATA[k].words.length,0);
+const IS_IOS_DEVICE=/iPhone|iPad|iPod/i.test(navigator.userAgent)
+  || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
 
 /* ================= STATE ================= */
 let state = {
@@ -636,6 +643,7 @@ let state = {
   reviews:{},
   stats:{reviewed:0, correct:0, streak:0, lastStudyDate:null},
   toast:null,
+  audioReady:!IS_IOS_DEVICE,
   quiz:{questions:[], idx:0, score:0, answered:false, picked:null},
   dialogKey:null
 };
@@ -754,11 +762,10 @@ function speak(text, options={}){
     };
 
     const replaceCurrent = options.cancel!==false && (synth.speaking || synth.pending);
-    const isiPhone=/iPhone|iPad|iPod/i.test(navigator.userAgent);
     // Na iOS nie anulujemy aktywnego głosu tuż przed kolejnym speak(),
     // bo WebKit potrafi wtedy wyciszyć również nową wypowiedź. Zamiast
     // tego kolejna wymowa trafia do kolejki systemowego lektora.
-    if(replaceCurrent && !isiPhone) synth.cancel();
+    if(replaceCurrent && !IS_IOS_DEVICE) synth.cancel();
 
     const startSpeaking=()=>{
       synth.resume();
@@ -769,9 +776,14 @@ function speak(text, options={}){
     // iPhone wymaga startu bezpośrednio po dotknięciu. Na Macu silnik
     // potrzebuje natomiast krótkiej przerwy tylko wtedy, gdy przed chwilą
     // anulowano inną wypowiedź.
-    if(replaceCurrent && !isiPhone) setTimeout(startSpeaking,60);
+    if(replaceCurrent && !IS_IOS_DEVICE) setTimeout(startSpeaking,60);
     else startSpeaking();
   });
+}
+function enableAudio(){
+  state.audioReady=true;
+  speak('Audio is ready');
+  render();
 }
 function stopSpeech(){
   dialogPlaybackToken++;
@@ -858,6 +870,16 @@ function render(){
       <button class="nav-item ${state.view==='progress'?'active':''}" onclick="goProgress()"><span class="ic">📊</span><span class="lb">Postępy</span></button>
       <div class="home-indicator"></div>
     </div>
+    ${!state.audioReady ? `
+      <div class="audio-gate">
+        <div class="audio-gate-card">
+          <div class="audio-gate-icon">🔊</div>
+          <div class="audio-gate-title">Włącz angielski głos</div>
+          <div class="audio-gate-copy">Safari na iPhonie wymaga jednego dotknięcia, zanim pozwoli aplikacji automatycznie odtwarzać wymowę.</div>
+          <button class="primary-btn" onclick="enableAudio()">Włącz audio</button>
+        </div>
+      </div>
+    ` : ''}
   `;
   if(state.view==='lesson'){
     setupSwipe();
@@ -867,6 +889,7 @@ function render(){
 
 let lastSpokenKey = null;
 function autoSpeakCurrentCard(){
+  if(!state.audioReady) return;
   const w = state.deck[state.idx];
   if(!w) return;
   const key = state.cat + '|' + w.en + '|' + state.idx + '|' + state.deck.length;
